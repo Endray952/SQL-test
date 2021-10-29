@@ -3,7 +3,9 @@ package com.example.sql_test
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import androidx.annotation.MainThread
+import com.example.sql_test.data_base.DataBaseConsts
 import com.example.sql_test.data_base.DataBaseManager
 
 class MainActivity : AppCompatActivity() {
@@ -18,7 +20,7 @@ class MainActivity : AppCompatActivity() {
         super.onResume()
         data_base_manager.openDb()
         /**Init table */
-        //data_base_manager.createDB()
+
        /* val thread = Thread{
             var startTime = System.currentTimeMillis()
             data_base_manager.createDB(1000)
@@ -36,12 +38,42 @@ class MainActivity : AppCompatActivity() {
         //data_base_manager.testChangeCellWithNonKey()
         //data_base_manager.testDeleteCellWithID()
         //data_base_manager.testDeleteCellWithNonKey()
-        data_base_manager.testDeleteGroupOfCells_1()
+        //data_base_manager.testDeleteGroupOfCells_1()
             //data_base_manager.testDeleteGroupOfCells_2()
         //data_base_manager.testCompressionOfDB()
         //data_base_manager.testCompressionOfDB200Left()
         //data_base_manager.test()
+        /*for (i in 1..20) {
+            val rnd = (1..DataBaseConsts.SIZE).random()
+            Log.d("MyLog", rnd.toString())
+        }*/
+        //data_base_manager.createDB()
+        //data_base_manager.db?.execSQL("INSERT INTO ${DataBaseConsts.TestTable.TABLE_NAME}${1000}_copy (${DataBaseConsts.TestTable.COLUMN_NAME_INTEGER}) VALUES (228)")
+        //data_base_manager.db?.execSQL("DELETE FROM ${DataBaseConsts.TestTable.TABLE_NAME}${1000}_copy")
+        //data_base_manager.db?.execSQL("VACUUM")
+    }
+    fun bt_1000(view: View){
+        //data_base_manager.testSearchWithID(1000)
+        //data_base_manager.testSearchWithNonKey(1000)
+        //data_base_manager.testSearchWithMask(1000)
+        //data_base_manager.testAddItem(1000)
+        data_base_manager.testAddGroupOfItems_1(1000)
 
+    }
+    fun bt_10000(view: View){
+       // data_base_manager.testSearchWithID(10000)
+        //data_base_manager.testSearchWithNonKey(10000)
+        //data_base_manager.testSearchWithMask(10000)
+        //data_base_manager.testAddItem(10000)
+        data_base_manager.testAddGroupOfItems_1(10000)
+
+    }
+    fun bt_100000(view: View){
+        //data_base_manager.testSearchWithID(100000)
+        //data_base_manager.testSearchWithNonKey(100000)
+        //data_base_manager.testSearchWithMask(100000)
+        //data_base_manager.testAddItem(100000)
+        data_base_manager.testAddGroupOfItems_1(100000)
     }
     override fun onStop() {
         super.onStop()
