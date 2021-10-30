@@ -6,15 +6,6 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Hello World!"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
     <Button
         android:id="@+id/button"
         android:layout_width="wrap_content"
@@ -22,6 +13,7 @@
         android:onClick="bt_1000"
         android:text="1000"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.21"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -33,6 +25,7 @@
         android:onClick="bt_100000"
         android:text="100000"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.21"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/button3" />
 
@@ -43,7 +36,96 @@
         android:onClick="bt_10000"
         android:text="10000"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.21"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/button" />
+
+    <RadioGroup
+        android:id="@+id/RadioGroup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toEndOf="@+id/button"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <RadioButton
+            android:id="@+id/KeySearch"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="KeySearch" />
+
+        <RadioButton
+            android:id="@+id/NonKeySearch"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="NonKeySearch" />
+
+        <RadioButton
+            android:id="@+id/Mask"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Mask" />
+
+        <RadioButton
+            android:id="@+id/Insert"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Insert" />
+
+        <RadioButton
+            android:id="@+id/GroupInsert"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="GroupInsert" />
+
+        <RadioButton
+            android:id="@+id/UpdateKey"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Update Key" />
+
+        <RadioButton
+            android:id="@+id/UpdateNonKey"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Update NonKey" />
+
+        <RadioButton
+            android:id="@+id/DeleteKey"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Delete Key" />
+
+        <RadioButton
+            android:id="@+id/DeleteNonKey"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Delete NonKey" />
+
+        <RadioButton
+            android:id="@+id/DeleteGroupKey"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Delete Group Key" />
+
+        <RadioButton
+            android:id="@+id/DeleteGroupNonKey"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Delete Group NonKey" />
+
+        <RadioButton
+            android:id="@+id/Compress"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Compress" />
+
+        <RadioButton
+            android:id="@+id/Compress200Left"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Compress 200 Left" />
+    </RadioGroup>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

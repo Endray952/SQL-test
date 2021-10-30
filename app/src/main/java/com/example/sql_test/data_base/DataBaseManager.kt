@@ -109,7 +109,6 @@ class DataBaseManager(context: Context) {
         val thread = Thread {
             var sum_time: Long = 0
             for (i in 1..100) {
-               // var rnd = "str${(1..SIZE).random()}"
                 var startTime = System.nanoTime()
                 val cursor = db?.rawQuery("SELECT * FROM ${DataBaseConsts.TestTable.TABLE_NAME}$size WHERE ${DataBaseConsts.TestTable.COLUMN_NAME_TEXT} LIKE '%2'", null)
                 var endTime = System.nanoTime()
@@ -192,28 +191,7 @@ class DataBaseManager(context: Context) {
         thread.start()
 
     }
-    fun testAddGroupOfItems_2(){
-        val thread = Thread {
-            var sum_time: Long = 0
-            for (i in 1..100) {
-                val str = "str$i"
-                val real: Double = i.toDouble()
-                val rnd = (1..SIZE/10).random()
-                val startTime = System.nanoTime()
-                    db?.execSQL("INSERT INTO ${DataBaseConsts.TestTable.TABLE_NAME} " +
-                            "(${DataBaseConsts.TestTable.COLUMN_NAME_INTEGER}, ${DataBaseConsts.TestTable.COLUMN_NAME_TEXT},  " +
-                            "${DataBaseConsts.TestTable.COLUMN_NAME_DOUBLE}, ${DataBaseConsts.TestTable.COLUMN_NAME_RANDOM_INT}) VALUES " +
-                            "($i, '$str', $real, $rnd), ($i, '$str', $real, $rnd),($i, '$str', $real, $rnd),($i, '$str', $real, $rnd)," +
-                            "($i, '$str', $real, $rnd),($i, '$str', $real, $rnd),($i, '$str', $real, $rnd),($i, '$str', $real, $rnd),($i, '$str', $real, $rnd),($i, '$str', $real, $rnd)")
-                val endTime = System.nanoTime()
-                sum_time += (endTime - startTime)
-                db?.execSQL("DELETE FROM ${DataBaseConsts.TestTable.TABLE_NAME} WHERE ${DataBaseConsts.TestTable.ID} > $SIZE ")
-                db?.execSQL("VACUUM")
-            }
-            Log.d("MyLog", "testAddGroupOfItems_2: ${(sum_time/100)}")
-        }
-        thread.start()
-    }
+
     fun testChangeCellWithID(size: Int){
         val thread = Thread {
             var sum_time: Long = 0
@@ -232,7 +210,7 @@ class DataBaseManager(context: Context) {
                     val rnd = (start until size + start).random()
                     //Log.d("MyLog", "$rnd $start ${size + start - 1}")
                     val startTime = System.nanoTime()
-                   db?.execSQL("UPDATE ${DataBaseConsts.TestTable.TABLE_NAME}${size}_copy SET ${DataBaseConsts.TestTable.COLUMN_NAME_TEXT} = '$rnd' " +
+                    db?.execSQL("UPDATE ${DataBaseConsts.TestTable.TABLE_NAME}${size}_copy SET ${DataBaseConsts.TestTable.COLUMN_NAME_TEXT} = '$rnd' " +
                                 "WHERE ${DataBaseConsts.TestTable.ID} = $rnd")
                     val endTime = System.nanoTime()
                     sum_time += (endTime - startTime)
@@ -346,13 +324,11 @@ class DataBaseManager(context: Context) {
     fun testDeleteGroupOfCells_1(size: Int, group_size: Int = 10){
         val thread = Thread {
             var sum_time: Long = 0
-            var a = 0
+            //var a = 0
             for (i in 1..100) {
                 db?.execSQL("INSERT INTO ${DataBaseConsts.TestTable.TABLE_NAME}${size}_copy SELECT * FROM ${DataBaseConsts.TestTable.TABLE_NAME}${size}")
                 val cursor = db?.rawQuery(
-                    "SELECT ${DataBaseConsts.TestTable.ID} FROM ${DataBaseConsts.TestTable.TABLE_NAME}${size}_copy",
-                    null
-                )
+                    "SELECT ${DataBaseConsts.TestTable.ID} FROM ${DataBaseConsts.TestTable.TABLE_NAME}${size}_copy", null)
                 cursor?.moveToFirst()
                 val start = cursor?.getInt(cursor?.getColumnIndex(DataBaseConsts.TestTable.ID))
                // Log.d("MyLog", start.toString())
@@ -364,28 +340,30 @@ class DataBaseManager(context: Context) {
                 if (start != null) {
                     val rnd_list = arrayListOf<Int>()
                     for (i in 1..group_size) {
-                        var elem = (start..start + size-1).random()
+                        var elem = (start until start + size).random()
                             while (rnd_list.contains(elem)) {
-                                elem = (start..start + size-1).random()
+                                elem = (start until start + size).random()
                             }
                         rnd_list.add(elem)
                     }
 
-                    val startTime = System.nanoTime()
+
+                    //val startTime = System.nanoTime()
                     for (k in 0 until group_size) {
-                        db?.execSQL(
-                            "DELETE FROM ${DataBaseConsts.TestTable.TABLE_NAME}${size}_copy " +
-                                    "WHERE ${DataBaseConsts.TestTable.ID} = ${rnd_list[k]}"
-                        )
+                        val startTime = System.nanoTime()
+                        db?.execSQL("DELETE FROM ${DataBaseConsts.TestTable.TABLE_NAME}${size}_copy " +
+                                    "WHERE ${DataBaseConsts.TestTable.ID} = ${rnd_list[k]}")
+                        val endTime = System.nanoTime()
+                        sum_time += (endTime - startTime)
                     }
-                    val endTime = System.nanoTime()
-                    sum_time += (endTime - startTime)
+                    //val endTime = System.nanoTime()
+                    //sum_time += (endTime - startTime)
                     db?.execSQL("DELETE FROM ${DataBaseConsts.TestTable.TABLE_NAME}${size}_copy")
                     db?.execSQL("VACUUM")
-                    a++;
+                    //a++;
                 }
             }
-            Log.d("MyLog", "a: $a")
+           // Log.d("MyLog", "a: $a")
             Log.d("MyLog", "testDeleteGroupOfCells_1 $size: ${(sum_time/100)}")
         }
         thread.start()
@@ -510,7 +488,7 @@ class DataBaseManager(context: Context) {
                 }
             }
 
-            Log.d("MyLog", "testCompressionOfDB $size: ${(sum_time/5)}")
+            Log.d("MyLog", "testCompressionOfDB200Left $size: ${(sum_time/5)}")
         }
         thread.start()
     }

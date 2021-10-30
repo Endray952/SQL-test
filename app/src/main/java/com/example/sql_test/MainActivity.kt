@@ -4,16 +4,38 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.widget.RadioGroup
 import androidx.annotation.MainThread
 import com.example.sql_test.data_base.DataBaseConsts
 import com.example.sql_test.data_base.DataBaseManager
-
+enum class RadioOptions{
+    KeySearch, NonKeySearch, Mask, Insert, GroupInsert, UpdateKey, UpdateNonKey, DeleteKey,DeleteNonKey,DeleteGroupKey,DeleteGroupNonKey,Compress,Compress200Left
+}
 class MainActivity : AppCompatActivity() {
     val data_base_manager = DataBaseManager(this)
+    var selected_test = RadioOptions.KeySearch
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         //data_base_manager.openDb()
+        val radio = findViewById<RadioGroup>(R.id.RadioGroup)
+        radio.setOnCheckedChangeListener{group, checkedID ->
+            when(checkedID){
+                R.id.KeySearch -> selected_test = RadioOptions.KeySearch
+                R.id.NonKeySearch -> selected_test = RadioOptions.NonKeySearch
+                R.id.Mask -> selected_test = RadioOptions.Mask
+                R.id.Insert -> selected_test = RadioOptions.Insert
+                R.id.GroupInsert -> selected_test = RadioOptions.GroupInsert
+                R.id.UpdateKey -> selected_test = RadioOptions.UpdateKey
+                R.id.UpdateNonKey -> selected_test = RadioOptions.UpdateNonKey
+                R.id.DeleteKey -> selected_test = RadioOptions.DeleteKey
+                R.id.DeleteNonKey -> selected_test = RadioOptions.DeleteNonKey
+                R.id.DeleteGroupKey -> selected_test = RadioOptions.DeleteGroupKey
+                R.id.DeleteGroupNonKey -> selected_test = RadioOptions.DeleteGroupNonKey
+                R.id.Compress -> selected_test = RadioOptions.Compress
+                R.id.Compress200Left -> selected_test = RadioOptions.Compress200Left
+            }
+        }
     }
 
     override fun onResume() {
@@ -21,32 +43,7 @@ class MainActivity : AppCompatActivity() {
         data_base_manager.openDb()
         /**Init table */
 
-       /* val thread = Thread{
-            var startTime = System.currentTimeMillis()
-            data_base_manager.createDB(1000)
-            var endTime = System.currentTimeMillis()
-            Log.d("MyLog",(endTime - startTime).toString() )
-        }
-        thread.start()*/
-        //data_base_manager.testSearchWithID()
-        //data_base_manager.testSearchWithNonKey()
-        //data_base_manager.testSearchWithMask()
-       // data_base_manager.testAddItem()
-        //data_base_manager.testAddGroupOfItems_1()
-        //data_base_manager.testAddGroupOfItems_2()
-        //data_base_manager.testChangeCellWithID()
-        //data_base_manager.testChangeCellWithNonKey()
-        //data_base_manager.testDeleteCellWithID()
-        //data_base_manager.testDeleteCellWithNonKey()
-        //data_base_manager.testDeleteGroupOfCells_1()
-            //data_base_manager.testDeleteGroupOfCells_2()
-        //data_base_manager.testCompressionOfDB()
-        //data_base_manager.testCompressionOfDB200Left()
-        //data_base_manager.test()
-        /*for (i in 1..20) {
-            val rnd = (1..DataBaseConsts.SIZE).random()
-            Log.d("MyLog", rnd.toString())
-        }*/
+
         //data_base_manager.createDB()
         //data_base_manager.db?.execSQL("INSERT INTO ${DataBaseConsts.TestTable.TABLE_NAME}${1000}_copy (${DataBaseConsts.TestTable.COLUMN_NAME_INTEGER}) VALUES (228)")
         //data_base_manager.db?.execSQL("DELETE FROM ${DataBaseConsts.TestTable.TABLE_NAME}${1000}_copy")
@@ -60,9 +57,25 @@ class MainActivity : AppCompatActivity() {
         data_base_manager.db?.execSQL("VACUUM")
     }
     fun bt_1000(view: View){
+        when(selected_test){
+            RadioOptions.KeySearch -> data_base_manager.testSearchWithID(1000)
+            RadioOptions.NonKeySearch -> data_base_manager.testSearchWithNonKey(1000)
+            RadioOptions.Mask -> data_base_manager.testSearchWithMask(1000)
+            RadioOptions.Insert ->  data_base_manager.testAddItem(1000)
+            RadioOptions.GroupInsert -> data_base_manager.testAddGroupOfItems_1(1000)
+            RadioOptions.UpdateKey -> data_base_manager.testChangeCellWithID(1000)
+            RadioOptions.UpdateNonKey -> data_base_manager.testChangeCellWithNonKey(1000)
+            RadioOptions.DeleteKey -> data_base_manager.testDeleteCellWithID(1000)
+            RadioOptions.DeleteNonKey -> data_base_manager.testDeleteCellWithNonKey(1000)
+            RadioOptions.DeleteGroupKey -> data_base_manager.testDeleteGroupOfCells_1(1000)
+            RadioOptions.DeleteGroupNonKey -> data_base_manager.testDeleteGroupOfCells_2(1000)
+            RadioOptions.Compress -> data_base_manager.testCompressionOfDB(1000)
+            RadioOptions.Compress200Left -> data_base_manager.testCompressionOfDB200Left(1000)
+
+        }
         //data_base_manager.testSearchWithID(1000)
-        data_base_manager.testSearchWithNonKey(1000)
-       // data_base_manager.testSearchWithMask(1000)
+        //data_base_manager.testSearchWithNonKey(1000)
+        //data_base_manager.testSearchWithMask(1000)
         //data_base_manager.testAddItem(1000)
         //data_base_manager.testAddGroupOfItems_1(1000)
         //data_base_manager.testChangeCellWithID(1000)
@@ -71,13 +84,29 @@ class MainActivity : AppCompatActivity() {
         //data_base_manager.testDeleteCellWithNonKey(1000)
         //data_base_manager.testDeleteGroupOfCells_1(1000)
         //data_base_manager.testDeleteGroupOfCells_2(1000)
-       // data_base_manager.testCompressionOfDB(1000)
+        //data_base_manager.testCompressionOfDB(1000)
         //data_base_manager.testCompressionOfDB200Left(1000)
     }
     fun bt_10000(view: View){
+        when(selected_test){
+            RadioOptions.KeySearch -> data_base_manager.testSearchWithID(10000)
+            RadioOptions.NonKeySearch -> data_base_manager.testSearchWithNonKey(10000)
+            RadioOptions.Mask -> data_base_manager.testSearchWithMask(10000)
+            RadioOptions.Insert ->  data_base_manager.testAddItem(10000)
+            RadioOptions.GroupInsert -> data_base_manager.testAddGroupOfItems_1(10000)
+            RadioOptions.UpdateKey -> data_base_manager.testChangeCellWithID(10000)
+            RadioOptions.UpdateNonKey -> data_base_manager.testChangeCellWithNonKey(10000)
+            RadioOptions.DeleteKey -> data_base_manager.testDeleteCellWithID(10000)
+            RadioOptions.DeleteNonKey -> data_base_manager.testDeleteCellWithNonKey(10000)
+            RadioOptions.DeleteGroupKey -> data_base_manager.testDeleteGroupOfCells_1(10000)
+            RadioOptions.DeleteGroupNonKey -> data_base_manager.testDeleteGroupOfCells_2(10000)
+            RadioOptions.Compress -> data_base_manager.testCompressionOfDB(10000)
+            RadioOptions.Compress200Left -> data_base_manager.testCompressionOfDB200Left(10000)
+
+        }
         //data_base_manager.testSearchWithID(10000)
-        data_base_manager.testSearchWithNonKey(10000)
-       // data_base_manager.testSearchWithMask(10000)
+        //data_base_manager.testSearchWithNonKey(10000)
+        //data_base_manager.testSearchWithMask(10000)
         //data_base_manager.testAddItem(10000)
         //data_base_manager.testAddGroupOfItems_1(10000)
         //data_base_manager.testChangeCellWithID(10000)
@@ -87,11 +116,27 @@ class MainActivity : AppCompatActivity() {
         //data_base_manager.testDeleteGroupOfCells_1(10000)
         //data_base_manager.testDeleteGroupOfCells_2(10000)
         //data_base_manager.testCompressionOfDB(10000)
-       // data_base_manager.testCompressionOfDB200Left(10000)
+        //data_base_manager.testCompressionOfDB200Left(10000)
     }
     fun bt_100000(view: View){
+        when(selected_test){
+            RadioOptions.KeySearch -> data_base_manager.testSearchWithID(100000)
+            RadioOptions.NonKeySearch -> data_base_manager.testSearchWithNonKey(100000)
+            RadioOptions.Mask -> data_base_manager.testSearchWithMask(100000)
+            RadioOptions.Insert ->  data_base_manager.testAddItem(100000)
+            RadioOptions.GroupInsert -> data_base_manager.testAddGroupOfItems_1(100000)
+            RadioOptions.UpdateKey -> data_base_manager.testChangeCellWithID(100000)
+            RadioOptions.UpdateNonKey -> data_base_manager.testChangeCellWithNonKey(100000)
+            RadioOptions.DeleteKey -> data_base_manager.testDeleteCellWithID(100000)
+            RadioOptions.DeleteNonKey -> data_base_manager.testDeleteCellWithNonKey(100000)
+            RadioOptions.DeleteGroupKey -> data_base_manager.testDeleteGroupOfCells_1(100000)
+            RadioOptions.DeleteGroupNonKey -> data_base_manager.testDeleteGroupOfCells_2(100000)
+            RadioOptions.Compress -> data_base_manager.testCompressionOfDB(100000)
+            RadioOptions.Compress200Left -> data_base_manager.testCompressionOfDB200Left(100000)
+
+        }
         //data_base_manager.testSearchWithID(100000)
-        data_base_manager.testSearchWithNonKey(100000)
+        //data_base_manager.testSearchWithNonKey(100000)
         //data_base_manager.testSearchWithMask(100000)
         //data_base_manager.testAddItem(100000)
         //data_base_manager.testAddGroupOfItems_1(100000)
@@ -102,7 +147,7 @@ class MainActivity : AppCompatActivity() {
         //data_base_manager.testDeleteGroupOfCells_1(100000)
         //data_base_manager.testDeleteGroupOfCells_2(100000)
         //data_base_manager.testCompressionOfDB(100000)
-        //data_base_manager.testCompressionOfDB200Left(100000)
+       // data_base_manager.testCompressionOfDB200Left(100000)
     }
     override fun onStop() {
         super.onStop()

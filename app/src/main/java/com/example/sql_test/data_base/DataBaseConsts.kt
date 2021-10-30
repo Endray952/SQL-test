@@ -2,7 +2,7 @@ package com.example.sql_test.data_base
 
 object DataBaseConsts {
     const val  DATABASE_NAME = "Test.db"
-    const val  DATABASE_VERSION = 40
+    const val  DATABASE_VERSION = 43
     const val  SIZE = 100000
 
     object TestTable {
