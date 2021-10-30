@@ -74,51 +74,32 @@ class DataBaseManager(context: Context) {
             for (i in 1..1000) {
                 val rnd = (1..size).random()
                 val startTime = System.nanoTime()
-                db?.rawQuery("SELECT * FROM ${DataBaseConsts.TestTable.TABLE_NAME}$size WHERE ${DataBaseConsts.TestTable.ID} = $rnd", null)
+                val cursor = db?.rawQuery("SELECT * FROM ${DataBaseConsts.TestTable.TABLE_NAME}$size WHERE ${DataBaseConsts.TestTable.ID} = $rnd", null)
                 val endTime = System.nanoTime()
                 sum_time += (endTime - startTime)
-                //Log.d("MyLog", "testSearchWithID: ${endTime - startTime}")
-
+                cursor?.moveToFirst()
+                //Log.d("MyLog", "$rnd ${cursor?.getInt(cursor.getColumnIndex(DataBaseConsts.TestTable.ID))}")
             }
-            //val endTime = System.nanoTime()
+            val endTime = System.nanoTime()
             //Log.d("MyLog", "testSearchWithID: ${(endTime - startTime)/1000}")
             Log.d("MyLog", "testSearchWithID $size: ${(sum_time/1000)}")
         }
         thread.start()
     }
-   /* fun testSearchWithNonKey(){
-        val thread = Thread {
-            var sum_time: Long = 0
-            for (i in 1..10) {
-                //var rnd = "str${(1..SIZE).random()}"
-                val rnd = (1..SIZE/10).random()
-                var startTime = System.nanoTime()
-                val cursor = db?.rawQuery("SELECT * FROM ${DataBaseConsts.TestTable.TABLE_NAME} WHERE ${DataBaseConsts.TestTable.COLUMN_NAME_RANDOM_INT} = $rnd", null)
-                var endTime = System.nanoTime()
-                sum_time += (endTime - startTime)
-                while(cursor?.moveToNext()!!){
-                    Log.d("MyLog", cursor.getString(cursor.getColumnIndex(DataBaseConsts.TestTable.COLUMN_NAME_RANDOM_INT)))
-                }
-                Log.d("MyLog", "")
-            }
-            Log.d("MyLog", "testSearchWithNonKey: ${(sum_time/10)}")
-        }
-        thread.start()
-    }*/
+
     fun testSearchWithNonKey(size: Int){
         val thread = Thread {
             var sum_time: Long = 0
             for (i in 1..1000) {
                 val rnd = (1..size/100).random()
-                var startTime = System.nanoTime()
+                val startTime = System.nanoTime()
                 val cursor = db?.rawQuery("SELECT * FROM ${DataBaseConsts.TestTable.TABLE_NAME}$size WHERE ${DataBaseConsts.TestTable.COLUMN_NAME_RANDOM_INT} = $rnd", null)
-                var endTime = System.nanoTime()
+                val endTime = System.nanoTime()
                 sum_time += (endTime - startTime)
-               /* while(cursor?.moveToNext()!!){
-                    cursor.getString(cursor.getColumnIndex(DataBaseConsts.TestTable.ID))
-                    cursor.getString(cursor.getColumnIndex(DataBaseConsts.TestTable.COLUMN_NAME_RANDOM_INT))
+                /*while (cursor?.moveToNext()!!){
+                    Log.d("MyLog", "$rnd ${cursor?.getInt(cursor.getColumnIndex(DataBaseConsts.TestTable.COLUMN_NAME_RANDOM_INT))} " +
+                            "${cursor?.getInt(cursor.getColumnIndex(DataBaseConsts.TestTable.ID))}")
                 }*/
-                //Log.d("MyLog", "")
             }
             Log.d("MyLog", "testSearchWithNonKey ${size}: ${(sum_time/1000)}")
         }
@@ -186,7 +167,7 @@ class DataBaseManager(context: Context) {
             Log.d("MyLog", "testAddItem ${size}: ${(sum_time/100)}")
         }
         thread.start()
-        //createDB()
+
     }
     fun testAddGroupOfItems_1(size: Int, group_size: Int = 10){
         val thread = Thread {
@@ -238,64 +219,75 @@ class DataBaseManager(context: Context) {
             var sum_time: Long = 0
             for (i in 1..100) {
                 db?.execSQL("INSERT INTO ${DataBaseConsts.TestTable.TABLE_NAME}${size}_copy SELECT * FROM ${DataBaseConsts.TestTable.TABLE_NAME}${size}")
-                val cursor =
-                val rnd = (1..size).random()
-                val startTime = System.nanoTime()
-                db?.execSQL("UPDATE ${DataBaseConsts.TestTable.TABLE_NAME} SET ${DataBaseConsts.TestTable.COLUMN_NAME_INTEGER} = $rnd " +
-                        "WHERE ${DataBaseConsts.TestTable.ID} = $rnd")
-                val endTime = System.nanoTime()
-                sum_time += (endTime - startTime)
+                val cursor = db?.rawQuery("SELECT ${DataBaseConsts.TestTable.ID} FROM ${DataBaseConsts.TestTable.TABLE_NAME}${size}_copy", null)
+                cursor?.moveToFirst()
+                val start = cursor?.getInt(cursor?.getColumnIndex(DataBaseConsts.TestTable.ID))
+                if (start == null) Log.d("MyLog", "null")
+                //Log.d("MyLog", start.toString())
+               /* for(k in 1..10){
+                    cursor?.moveToNext()!!
+                    Log.d("MyLog", cursor.getString(cursor.getColumnIndex(DataBaseConsts.TestTable.ID)))
+                }*/
+                if(start != null) {
+                    val rnd = (start until size + start).random()
+                    //Log.d("MyLog", "$rnd $start ${size + start - 1}")
+                    val startTime = System.nanoTime()
+                   db?.execSQL("UPDATE ${DataBaseConsts.TestTable.TABLE_NAME}${size}_copy SET ${DataBaseConsts.TestTable.COLUMN_NAME_TEXT} = '$rnd' " +
+                                "WHERE ${DataBaseConsts.TestTable.ID} = $rnd")
+                    val endTime = System.nanoTime()
+                    sum_time += (endTime - startTime)
+                    db?.execSQL("DELETE FROM ${DataBaseConsts.TestTable.TABLE_NAME}${size}_copy")
+                    db?.execSQL("VACUUM")
+                }
             }
-            Log.d("MyLog", "testChangeCellWithID: ${(sum_time/100)}")
+            Log.d("MyLog", "testChangeCellWithID $size: ${(sum_time/100)}")
         }
         thread.start()
     }
-    fun testChangeCellWithNonKey(){
+    fun testChangeCellWithNonKey(size: Int){
         val thread = Thread {
             var sum_time: Long = 0
             for (i in 1..100) {
-                val rnd = (1..SIZE).random()
-                val rnd_int = (1..SIZE/10).random()
-               // val str_rnd = "str$rnd"
+                val rnd = (1..size/100).random()
+                db?.execSQL("INSERT INTO ${DataBaseConsts.TestTable.TABLE_NAME}${size}_copy SELECT * FROM ${DataBaseConsts.TestTable.TABLE_NAME}${size}")
                 val startTime = System.nanoTime()
-                db?.rawQuery("UPDATE ${DataBaseConsts.TestTable.TABLE_NAME} SET ${DataBaseConsts.TestTable.COLUMN_NAME_INTEGER} = $rnd " +
-                        "WHERE ${DataBaseConsts.TestTable.COLUMN_NAME_RANDOM_INT} = '$rnd_int'", null)
+                db?.execSQL("UPDATE ${DataBaseConsts.TestTable.TABLE_NAME}${size}_copy SET ${DataBaseConsts.TestTable.COLUMN_NAME_TEXT} = '$rnd' " +
+                        "WHERE ${DataBaseConsts.TestTable.COLUMN_NAME_RANDOM_INT} = $rnd")
                 val endTime = System.nanoTime()
                 sum_time += (endTime - startTime)
+                db?.execSQL("DELETE FROM ${DataBaseConsts.TestTable.TABLE_NAME}${size}_copy")
+                db?.execSQL("VACUUM")
             }
             Log.d("MyLog", "testChangeCellWithNonKey: ${(sum_time/100)}")
         }
         thread.start()
     }
-    fun testDeleteCellWithID(){
+    fun testDeleteCellWithID(size: Int){
         val thread = Thread {
             var sum_time: Long = 0
-            val listOfrnd = arrayListOf<Int>()
-            for (i in 1..100) {
-                val cursor = db?.rawQuery("SELECT ${DataBaseConsts.TestTable.ID} FROM ${DataBaseConsts.TestTable.TABLE_NAME}", null)
-                val list = arrayListOf<Int>()
-                while (cursor?.moveToNext()!!){
-                    list.add(cursor.getInt(cursor.getColumnIndex(DataBaseConsts.TestTable.ID)))
-                }
-                cursor.close()
-                var rnd = (1..SIZE).random()
-                while(listOfrnd.contains(list[rnd])){
-                    rnd = (1..SIZE).random()
-                }
-                listOfrnd.add(list[rnd])
-                val startTime = System.nanoTime()
-                db?.execSQL("DELETE FROM ${DataBaseConsts.TestTable.TABLE_NAME} " +
-                        "WHERE ${DataBaseConsts.TestTable.ID} = ${list[rnd]}")
-                val endTime = System.nanoTime()
-                sum_time += (endTime - startTime)
-                db?.execSQL("INSERT INTO ${DataBaseConsts.TestTable.TABLE_NAME} " +
-                        "(${DataBaseConsts.TestTable.COLUMN_NAME_INTEGER}, ${DataBaseConsts.TestTable.COLUMN_NAME_TEXT},  " +
-                        "${DataBaseConsts.TestTable.COLUMN_NAME_DOUBLE}) VALUES (${list[rnd]}, '${"str${list[rnd]}"}', ${list[rnd].toDouble()})")
-            }
 
-            Log.d("MyLog", "testDeleteCellWithID: ${(sum_time/100)}")
-            //db?.execSQL("Vacuum")
-            createDB()
+            for (i in 1..100) {
+                db?.execSQL("INSERT INTO ${DataBaseConsts.TestTable.TABLE_NAME}${size}_copy SELECT * FROM ${DataBaseConsts.TestTable.TABLE_NAME}${size}")
+                val cursor = db?.rawQuery("SELECT * FROM ${DataBaseConsts.TestTable.TABLE_NAME}${size}_copy", null)
+                cursor?.moveToFirst()
+                val start = cursor?.getInt(cursor.getColumnIndex(DataBaseConsts.TestTable.ID))
+                //val str = cursor?.getString(cursor.getColumnIndex(DataBaseConsts.TestTable.COLUMN_NAME_TEXT))
+                cursor?.close()
+                //Log.d("MyLog", start.toString())
+                if(start != null) {
+                    val rnd = (start until size + start).random()
+                    val startTime = System.nanoTime()
+                    db?.execSQL("DELETE FROM ${DataBaseConsts.TestTable.TABLE_NAME}${size}_copy " +
+                                "WHERE ${DataBaseConsts.TestTable.ID} = $rnd")
+                    val endTime = System.nanoTime()
+                    sum_time += (endTime - startTime)
+                    //Log.d("MyLog", "$start $rnd $str")
+                    db?.execSQL("DELETE FROM ${DataBaseConsts.TestTable.TABLE_NAME}${size}_copy")
+                    db?.execSQL("VACUUM")
+                }
+            }
+            Log.d("MyLog", "testDeleteCellWithID $size: ${(sum_time/100)}")
+
         }
         thread.start()
     }
@@ -326,121 +318,110 @@ class DataBaseManager(context: Context) {
                         "${DataBaseConsts.TestTable.COLUMN_NAME_DOUBLE}) VALUES (${list[rnd]}, '${"str${list[rnd]}"}', ${list[rnd].toDouble()})")
             }
             Log.d("MyLog", "testDeleteCellWithID: ${(sum_time/100)}")
-            createDB()
+
             //db?.execSQL("Vacuum")
         }
         thread.start()
     }*/
-    fun testDeleteCellWithNonKey(){
+    fun testDeleteCellWithNonKey(size: Int){
         val thread = Thread {
             var sum_time: Long = 0
             for (i in 1..100) {
-                val rnd = (1..SIZE/10).random()
-                val cursor = db?.rawQuery("SELECT ${DataBaseConsts.TestTable.COLUMN_NAME_RANDOM_INT} FROM ${DataBaseConsts.TestTable.TABLE_NAME} " +
-                        "WHERE ${DataBaseConsts.TestTable.COLUMN_NAME_RANDOM_INT} = $rnd",null)
-                var elem_num = 0
-                while(cursor?.moveToNext()!!){
-                    elem_num++
-                }
-                val startTime = System.nanoTime()
-                db?.execSQL("DELETE FROM ${DataBaseConsts.TestTable.TABLE_NAME} " +
-                        "WHERE ${DataBaseConsts.TestTable.COLUMN_NAME_RANDOM_INT} = $rnd")
-                val endTime = System.nanoTime()
-                sum_time += (endTime - startTime)
-                for (i in 1..elem_num){
-                    db?.execSQL("INSERT INTO ${DataBaseConsts.TestTable.TABLE_NAME}(${DataBaseConsts.TestTable.COLUMN_NAME_RANDOM_INT}) VALUES ($rnd)")
-                }
+                db?.execSQL("INSERT INTO ${DataBaseConsts.TestTable.TABLE_NAME}${size}_copy SELECT * FROM ${DataBaseConsts.TestTable.TABLE_NAME}${size}")
+                    val rnd = (1..size/100).random()
+                    val startTime = System.nanoTime()
+                    db?.execSQL(
+                        "DELETE FROM ${DataBaseConsts.TestTable.TABLE_NAME}${size}_copy " +
+                                "WHERE ${DataBaseConsts.TestTable.COLUMN_NAME_RANDOM_INT} = $rnd"
+                    )
+                    val endTime = System.nanoTime()
+                    sum_time += (endTime - startTime)
+                    db?.execSQL("DELETE FROM ${DataBaseConsts.TestTable.TABLE_NAME}${size}_copy")
+                    db?.execSQL("VACUUM")
             }
-            Log.d("MyLog", "testDeleteCellWithNonKey: ${(sum_time/100)}")
-            createDB()
+            Log.d("MyLog", "testDeleteCellWithNonKey $size: ${(sum_time/100)}")
         }
         thread.start()
     }
-    fun testDeleteGroupOfCells_1(group_size: Int = 10){
+    fun testDeleteGroupOfCells_1(size: Int, group_size: Int = 10){
         val thread = Thread {
             var sum_time: Long = 0
-            val cursor = db?.rawQuery("SELECT ${DataBaseConsts.TestTable.ID} FROM ${DataBaseConsts.TestTable.TABLE_NAME}",null)
-            cursor?.moveToFirst()
-            val start_ind = cursor?.getInt(cursor.getColumnIndex(DataBaseConsts.TestTable.ID))
-            cursor?.close()
-            if (start_ind != null) {
+            var a = 0
+            for (i in 1..100) {
+                db?.execSQL("INSERT INTO ${DataBaseConsts.TestTable.TABLE_NAME}${size}_copy SELECT * FROM ${DataBaseConsts.TestTable.TABLE_NAME}${size}")
+                val cursor = db?.rawQuery(
+                    "SELECT ${DataBaseConsts.TestTable.ID} FROM ${DataBaseConsts.TestTable.TABLE_NAME}${size}_copy",
+                    null
+                )
+                cursor?.moveToFirst()
+                val start = cursor?.getInt(cursor?.getColumnIndex(DataBaseConsts.TestTable.ID))
+               // Log.d("MyLog", start.toString())
+                /*while (cursor?.moveToNext()!!){
+                    Log.d("MyLog", cursor.getString(cursor.getColumnIndex(DataBaseConsts.TestTable.ID)))
+                }*/
+                cursor?.close()
 
-
-                for (i in 1..100) {
-                    val rnd = arrayListOf<Int>()
+                if (start != null) {
+                    val rnd_list = arrayListOf<Int>()
                     for (i in 1..group_size) {
-                        rnd.add((start_ind..(start_ind +SIZE + group_size*(i-1))).random())
+                        var elem = (start..start + size-1).random()
+                            while (rnd_list.contains(elem)) {
+                                elem = (start..start + size-1).random()
+                            }
+                        rnd_list.add(elem)
+                    }
+
+                    val startTime = System.nanoTime()
+                    for (k in 0 until group_size) {
+                        db?.execSQL(
+                            "DELETE FROM ${DataBaseConsts.TestTable.TABLE_NAME}${size}_copy " +
+                                    "WHERE ${DataBaseConsts.TestTable.ID} = ${rnd_list[k]}"
+                        )
+                    }
+                    val endTime = System.nanoTime()
+                    sum_time += (endTime - startTime)
+                    db?.execSQL("DELETE FROM ${DataBaseConsts.TestTable.TABLE_NAME}${size}_copy")
+                    db?.execSQL("VACUUM")
+                    a++;
+                }
+            }
+            Log.d("MyLog", "a: $a")
+            Log.d("MyLog", "testDeleteGroupOfCells_1 $size: ${(sum_time/100)}")
+        }
+        thread.start()
+    }
+
+    fun testDeleteGroupOfCells_2(size: Int, group_size: Int = 10){
+        val thread = Thread {
+            var sum_time: Long = 0
+            for (i in 1..100) {
+                db?.execSQL("INSERT INTO ${DataBaseConsts.TestTable.TABLE_NAME}${size}_copy SELECT * FROM ${DataBaseConsts.TestTable.TABLE_NAME}${size}")
+                    val rnd_list = arrayListOf<Int>()
+                    for (i in 1..group_size) {
+                        var elem = (1..size).random()
+                        while (rnd_list.contains(elem)) {
+                            elem = (1..size).random()
+                        }
+                        rnd_list.add(elem)
                     }
                     val startTime = System.nanoTime()
                     for (k in 0 until group_size) {
                         db?.execSQL(
-                            "DELETE FROM ${DataBaseConsts.TestTable.TABLE_NAME} " +
-                                    "WHERE ${DataBaseConsts.TestTable.ID} = ${rnd[k]}"
+                            "DELETE FROM ${DataBaseConsts.TestTable.TABLE_NAME}${size}_copy " +
+                                    "WHERE ${DataBaseConsts.TestTable.COLUMN_NAME_INTEGER} = ${rnd_list[k]}"
                         )
                     }
                     val endTime = System.nanoTime()
                     sum_time += (endTime - startTime)
+                    db?.execSQL("DELETE FROM ${DataBaseConsts.TestTable.TABLE_NAME}${size}_copy")
+                    db?.execSQL("VACUUM")
 
-                    for (k in 0 until group_size){
-                        db?.execSQL("INSERT INTO ${DataBaseConsts.TestTable.TABLE_NAME}" +
-                                "(${DataBaseConsts.TestTable.COLUMN_NAME_INTEGER},${DataBaseConsts.TestTable.COLUMN_NAME_TEXT}," +
-                                "${DataBaseConsts.TestTable.COLUMN_NAME_DOUBLE},${DataBaseConsts.TestTable.COLUMN_NAME_RANDOM_INT}) VALUES " +
-                                "($k, 'str$k', ${k.toDouble()}, $k)")
-                    }
-                }
-                Log.d("MyLog", "testDeleteGroupOfCells_1: ${(sum_time / 100)}")
-                createDB()
             }
+            Log.d("MyLog", "testDeleteGroupOfCells_2 $size: ${(sum_time/100)}")
         }
         thread.start()
     }
-
-    fun testDeleteGroupOfCells_2(group_size: Int = 10){
-        val thread = Thread {
-            var sum_time: Long = 0
-            val cursor = db?.rawQuery("SELECT ${DataBaseConsts.TestTable.ID} FROM ${DataBaseConsts.TestTable.TABLE_NAME}",null)
-            cursor?.moveToFirst()
-            val start_ind = cursor?.getInt(cursor.getColumnIndex(DataBaseConsts.TestTable.ID))
-            cursor?.close()
-            if (start_ind != null) {
-
-                for (i in 1..100) {
-                    val rnd = arrayListOf<Int>()
-                    for (i in 1..group_size) {
-                        rnd.add((start_ind..(start_ind +SIZE + group_size*(i-1))).random())
-                    }
-
-                    val startTime = System.nanoTime()
-                        db?.execSQL(
-                            "DELETE FROM ${DataBaseConsts.TestTable.TABLE_NAME} " +
-                                    "WHERE ${DataBaseConsts.TestTable.ID} = ${rnd[0]} " +
-                                    "OR ${DataBaseConsts.TestTable.ID} = ${rnd[1]} " +
-                                    "OR ${DataBaseConsts.TestTable.ID} = ${rnd[2]} " +
-                                    "OR ${DataBaseConsts.TestTable.ID} = ${rnd[3]} " +
-                                    "OR ${DataBaseConsts.TestTable.ID} = ${rnd[4]} " +
-                                    "OR ${DataBaseConsts.TestTable.ID} = ${rnd[5]} " +
-                                    "OR ${DataBaseConsts.TestTable.ID} = ${rnd[6]} " +
-                                    "OR ${DataBaseConsts.TestTable.ID} = ${rnd[7]} " +
-                                    "OR ${DataBaseConsts.TestTable.ID} = ${rnd[8]} " +
-                                    "OR ${DataBaseConsts.TestTable.ID} = ${rnd[9]} "
-                        )
-                    val endTime = System.nanoTime()
-                    sum_time += (endTime - startTime)
-
-                    for (k in 0 until group_size){
-                        db?.execSQL("INSERT INTO ${DataBaseConsts.TestTable.TABLE_NAME}" +
-                                "(${DataBaseConsts.TestTable.COLUMN_NAME_INTEGER},${DataBaseConsts.TestTable.COLUMN_NAME_TEXT}," +
-                                "${DataBaseConsts.TestTable.COLUMN_NAME_DOUBLE},${DataBaseConsts.TestTable.COLUMN_NAME_RANDOM_INT}) VALUES " +
-                                "($k, 'str$k', ${k.toDouble()}, $k)")
-                    }
-                }
-                Log.d("MyLog", "testDeleteGroupOfCells_2: ${(sum_time / 100)}")
-                createDB()
-            }
-        }
-        thread.start()
-    }
-    fun testCompressionOfDB(){
+    /*fun testCompressionOfDB(){
         val thread = Thread {
             createDBSameThread()
             var sum_time: Long = 0
@@ -474,39 +455,62 @@ class DataBaseManager(context: Context) {
             //createDB()
         }
         thread.start()
-    }
-    fun testCompressionOfDB200Left(){
+    }*/
+    fun testCompressionOfDB(size: Int){
         val thread = Thread {
-            createDBSameThread()
             var sum_time: Long = 0
-            for (i in 1..10) {
-                val cursor = db?.rawQuery("SELECT ${DataBaseConsts.TestTable.ID} FROM ${DataBaseConsts.TestTable.TABLE_NAME}",null)
-                if(cursor == null) Log.d("MyLog", "Cursor null")
+            for (i in 1..100) {
+                db?.execSQL("INSERT INTO ${DataBaseConsts.TestTable.TABLE_NAME}${size}_copy SELECT * FROM ${DataBaseConsts.TestTable.TABLE_NAME}${size}")
+                val cursor = db?.rawQuery("SELECT ${DataBaseConsts.TestTable.ID} FROM ${DataBaseConsts.TestTable.TABLE_NAME}${size}_copy", null)
                 cursor?.moveToFirst()
-                val start_ind = cursor?.getInt(cursor.getColumnIndex(DataBaseConsts.TestTable.ID))
+                val start = cursor?.getInt(cursor?.getColumnIndex(DataBaseConsts.TestTable.ID))
                 cursor?.close()
-                if(start_ind != null) {
-                    for (i in 1..(SIZE - 200)) {
+                if (start != null) {
+                    for (i in 1..200) {
                         db?.execSQL(
-                            "DELETE FROM ${DataBaseConsts.TestTable.TABLE_NAME} " +
-                                    "WHERE ${DataBaseConsts.TestTable.ID} = ${start_ind + i}"
-                        )
+                            "DELETE FROM ${DataBaseConsts.TestTable.TABLE_NAME}${size}_copy " +
+                                    "WHERE ${DataBaseConsts.TestTable.ID} = ${start + i}")
                     }
-
                     val startTime = System.nanoTime()
                     db?.execSQL("VACUUM")
                     val endTime = System.nanoTime()
                     sum_time += (endTime - startTime)
-                    createDBSameThread()
+
+                    db?.execSQL("DELETE FROM ${DataBaseConsts.TestTable.TABLE_NAME}${size}_copy")
+                    db?.execSQL("VACUUM")
+                    }
                 }
-                else{
-                    Log.d("MyLog", "ERROR")
+
+            Log.d("MyLog", "testCompressionOfDB $size: ${(sum_time/100)}")
+        }
+        thread.start()
+    }
+    fun testCompressionOfDB200Left(size: Int){
+        val thread = Thread {
+            var sum_time: Long = 0
+            for (i in 1..5) {
+                db?.execSQL("INSERT INTO ${DataBaseConsts.TestTable.TABLE_NAME}${size}_copy SELECT * FROM ${DataBaseConsts.TestTable.TABLE_NAME}${size}")
+                val cursor = db?.rawQuery("SELECT ${DataBaseConsts.TestTable.ID} FROM ${DataBaseConsts.TestTable.TABLE_NAME}${size}_copy", null)
+                cursor?.moveToFirst()
+                val start = cursor?.getInt(cursor?.getColumnIndex(DataBaseConsts.TestTable.ID))
+                cursor?.close()
+                if (start != null) {
+                    for (i in start..size + start - 200) {
+                        db?.execSQL(
+                            "DELETE FROM ${DataBaseConsts.TestTable.TABLE_NAME}${size}_copy " +
+                                    "WHERE ${DataBaseConsts.TestTable.ID} = ${start + i}")
+                    }
+                    val startTime = System.nanoTime()
+                    db?.execSQL("VACUUM")
+                    val endTime = System.nanoTime()
+                    sum_time += (endTime - startTime)
+
+                    db?.execSQL("DELETE FROM ${DataBaseConsts.TestTable.TABLE_NAME}${size}_copy")
+                    db?.execSQL("VACUUM")
                 }
             }
 
-            Log.d("MyLog", "testCompressionOfDB: ${(sum_time/10)}")
-
-            //createDB()
+            Log.d("MyLog", "testCompressionOfDB $size: ${(sum_time/5)}")
         }
         thread.start()
     }
